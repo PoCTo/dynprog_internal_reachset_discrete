@@ -70,7 +70,7 @@ u(k)\in \mathbb{R}^m, x(k)\in \mathbb{R}^n.
 \begin{df}
 \textit{Эллипсоидом} $\ell(q,Q), Q\in\mathbb{R}^{n\times n}$ в $n$-мерном пространстве назовём множество точек
 \[ \ell(q,Q) = \left\{ x\colon (x-q)Q^{-1}(x-q)' \leqslant 1 \right\}. \]
-Здесь $q$ --- \textit{центр} эллипсоида, а $Q$ --- \textit{матрица} эллипсоида. 
+Здесь $q$ --- \textit{центр} эллипсоида, а $Q$ --- симметричная неотрицательно определенная \textit{матрица} эллипсоида. 
 \end{df}
 Эллипсоид назовем \textit{вырожденным}, если его матрица имеет неполный ранг, или, что равносильно, $\det Q = 0$.
 \begin{df}
@@ -115,7 +115,7 @@ u(k)\in \mathbb{R}^m, x(k)\in \mathbb{R}^n.
 Если умножение на невырожденную матрицу не выводит из класса эллипсоидов, то сумма двух эллипсоидов, вообще говоря, этому классу не принадлежит, поэтому множество достижимости конкретным эллипсоидом записать не получится. Однако возможно эллипсоидальное оценивание этого множества.
 
 Для начала найдем опорную функцию множества достижимости, пользуясь свойством её линейности относительно сумм по Минковскому, а так же тем, что опорная функция эллипсоида $\sufu{l}{\ell(x,X)}$ равна $\scalar{l}{x}+\norm{l}_X$:
-\begin{gather}
+\begin{gather}\label{th:ellipsoids_follow}
 \notag\sufu{l}{\mathcal{X}\left(k,k_0,\ell\left(x_0,X_0\right)\right)} = \sufu{l}{q_c\left(k\right)} + \sufu{l}{\Phi\left(k,k_0\right)\ell\left(0,X_0\right)} +\\ 
 			\notag + 
 			 \sum\limits_{i=k_0}^{k-1}\sufu{l}{\Phi\left(k,i+1\right)B\left(i\right)\ell\left(0,Q\left(i\right)\right)} = 
@@ -128,17 +128,24 @@ u(k)\in \mathbb{R}^m, x(k)\in \mathbb{R}^n.
 			  +
 			\scalar{l}{\Phi\left(k,i+1\right)B\left(i\right)Q\left(i\right)B\left(i\right)'\Phi\left(k,i+1\right)'l}^{1/2}.
 \end{gather}
-
+Заметим, что если предположить, что центры всех эллипсов нулевые, то из \eqref{th:ellipsoids_follow} исчезнет лишь первое слагаемое.
 \begin{theorem}
 Эллипсоид, являющийся внутренней оценкой суммы $\ell(0,Q_1)+\dots+\ell(0,Q_n)$, имеет матрицу
 \begin{equation}\label{th:ell} Q = Q_*'Q_*,\quad Q_*=\sum\limits_{1}^{n} S_kQ_k^{1/2},\ S_kS'_k=I, \end{equation}
 причем для оптимальности (в смысле касания заданного множества в направлении $l$) необходима и достаточна линейная зависимость векторов $S_kQ_k^{1/2}l,\ k=1,\dots,n.$
 \end{theorem}
 \begin{proof}
-Для доказательства внутренности оценки достаточно показать, что опорная функция эллипсоида с матрицей \eqref{th:ell} всюду меньше опорной функции суммы эллипсоидов. Сравним квадраты опорных функций и воспользуемся неравенством о средних и неравенством Коши-Буняковского:
-\begin{align*}
-\sufu{l}{\ell(0,Q)} &=  
-\end{align*}
+Для доказательства внутренности оценки достаточно показать, что опорная функция эллипсоида с матрицей \eqref{th:ell} всюду не больше опорной функции суммы эллипсоидов. Сравним квадраты опорных функций, пользуясь неравенством Коши-Буняковского, а так же \eqref{th:ellipsoids_follow}:
+\begin{gather*}
+	\sufu{l}{\ell(0,Q)}^2 = \scalar {l}{\left( \sum\limits_{k=1}^{n}S_k Q_k^{1/2} \right)'\left( \sum\limits_{k=1}^{n}S_k Q_k^{1/2} \right)l} = 
+	\sum\limits_{k=1}^{n}\scalar{l}{Q_kl} +  \\
+		+ 2\sum\limits_{k=1}^{n} \sum\limits_{p=k+1}^{n}\scalar{S_kQ_k^{1/2}l}{S_pQ_p^{1/2}l} 
+	\leqslant \sum\limits_{k=1}^{n}\scalar{l}{Q_kl} + 
+		2\sum\limits_{k=1}^{n} \sum\limits_{p=k+1}^{n}\scalar{l}{Q_kl}^{1/2}\scalar{l}{Q_pl}^{1/2} = \\
+	= \left( \sum\limits_{k=1}^{n}\scalar{l}{Q_kl}^{1/2} \right)^2 
+	= \sufu{l}{\sum\limits_{k=1}^{n} \ell\left(0,X_k\right)}^2.
+\end{gather*}
+Равенство в неравенстве Коши-Буняковского, то есть оптимальность в смысле касания, достигается тогда и только тогда, когда линейно зависимы векторы $S_kQ_k^{1/2}l$.
 \end{proof}
 
 
