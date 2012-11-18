@@ -1,0 +1,11 @@
+*.pdf
+*.dvi
+*.bbl
+*.ps
+*.aux
+*.log
+*.out
+*.blg
+*.toc
+*.synctex*
+*.m~
