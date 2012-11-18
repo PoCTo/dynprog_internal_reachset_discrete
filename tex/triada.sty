@@ -1,0 +1,250 @@
+\NeedsTeXFormat{LaTeX2e} % Взято у Дарьина
+\ProvidesPackage{triada}
+%Опции локализации
+\RequirePackage[fleqn]{amsmath}
+	\RequirePackage[utf8]{inputenc}
+	\RequirePackage[english,russian]{babel}
+	\RequirePackage[T2A]{fontenc}
+
+%% опции текста
+% Переопределение стандартных заголовков
+\def\contentsname{Оглавление}
+\def\figurename{Рис.}
+\def\partname{Часть}
+\def\listfigurename{Список рисунков}
+\def\listtablename{Список таблиц}
+\def\refname{Литература}
+\def\bibname{Литература}
+\def\indexname{Предметный указатель}
+\def\tablename{Таблица}
+\def\abstractname{Аннотация}
+\@ifundefined{chapter}{}{\def\chaptername{Глава}}
+\def\proofname{Доказательство}
+\def\appendixname{Приложение}
+\def\prefacename{Предисловие}
+
+\RequirePackage{a4wide}
+\RequirePackage{multicol} % много колонок
+\columnseprule = 0.0pt % толщина линейки в multicols
+\columnsep = 24pt % зазор между колонками
+\RequirePackage{textcomp}
+\frenchspacing % пробелы после знаков препинания
+
+% Переопределение стиля начала секций, появился абзацный отступ
+% manual: глава 9 книги Львовского
+%\renewcommand{\chapter}{\cleardoublepage
+%  \thispagestyle{plain}%
+%  \global\@topnum=0
+%  \@afterindenttrue
+%  \secdef\@chapter\@schapter}
+\renewcommand{\section}{\@startsection{section}{1}%
+  {0pt}{3.5ex plus 1ex minus .2ex}%
+  {2.3ex plus .2ex}{\center\normalfont\Large\bfseries\sffamily}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}%
+  {0pt}{3.25ex plus 1ex minus .2ex}%
+  {2.3ex plus .2ex}{\center\normalfont\large\bfseries\sffamily}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}%
+  {0pt}{3.25ex plus 1ex minus .2ex}%
+  {2.3ex plus .2ex}{\center\normalfont\bfseries\sffamily}}
+  
+% Взято у Львовского, ставятся точки в нумерации разделов
+% manual: приложение Е книги Львовского
+\def\@seccntformat#1{\csname pre#1\endcsname\csname the#1\endcsname
+                \csname post#1\endcsname}
+\let\@Tocseccntformat\@seccntformat
+\def\@postskip@{\hskip.5em\relax}
+\def\postsection{.\@postskip@}
+\def\postsubsection{.\@postskip@}
+\def\postsubsubsection{.\@postskip@}
+\def\postparagraph{.\@postskip@}
+\def\postsubparagraph{.\@postskip@}
+\def\presection{}
+\def\presubsection{}
+\def\presubsubsection{}
+\def\preparagraph{}
+\def\presubparagraph{}
+%,pagecolor=black
+%\RequirePackage[dvips,usenames]{color}
+  % use \color{red} to change text color
+\RequirePackage[dvips,unicode,colorlinks,%
+linkcolor=black,filecolor=black,%
+citecolor=black,urlcolor=black,anchorcolor=black,%
+pdfstartview={Fit},pdfpagetransition={Split /Dm /H /M /I}]{hyperref}
+  % \href{www.yandex.ru}{Яндекс}
+  % \url{www.yandex.ru}
+\RequirePackage{type1ec} % for pdfLatex
+%\RequirePackage{cmap} % for pdfLatex
+
+%\renewcommand{\thesection}
+%  {\textsection\arabic{section}}
+%\renewcommand{\thesubsection}
+%  {\arabic{section}.\arabic{subsection}}
+%\renewcommand{\thesubsubsection}
+%  {\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
+
+%\renewcommand{\@listI}{%
+%\leftmargin=25pt
+%\rightmargin=0pt
+%\labelsep=5pt
+%\labelwidth=20pt
+%\itemindent=0pt
+%\listparindent=0pt
+%\topsep=8pt plus 2pt minus 4pt
+%\partopsep=2pt plus 1pt minus 1pt
+%\parsep=0pt plus 1pt
+%\itemsep=0pt plus 1pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Прочие математические пакеты
+\RequirePackage{graphicx}
+%\RequirePackage[fleqn]{amsmath}
+\RequirePackage{amsfonts}
+\RequirePackage{amssymb}
+\RequirePackage{amsthm}
+\RequirePackage{mathrsfs}
+%\RequirePackage[integrals]{wasysym}
+%\RequirePackage{euler} % Прямой стиль формул
+%\RequirePackage{amscd} % Коммут. диаграммы
+%\RequirePackage{pb-diagram} % Тоже, но лучше
+
+\setcounter{MaxMatrixCols}{15} % Макс. кол-во столбцов
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% 	Теоремы, леммы, указания, замечания...
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Теорема}[section]
+\newtheorem{stm}{Утверждение}[section]
+\newtheorem{lemma}{Лемма}[section]
+\newtheorem*{imp}{Следствие}
+
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}
+\newtheorem*{tproblem}{Указание}
+\newtheorem{df}{Определение}[section]
+\newtheorem{ex}{Пример}[section]
+\newtheorem{task}{Упражнение}
+\newenvironment{solution}{\par\textbf{Решение.}}{\par}
+
+\theoremstyle{remark}
+\newtheorem*{note}{Замечание}
+
+\numberwithin{equation}{section}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%	Математичесике операторы
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\linspace}[2]{\mathcal{L}\left( #1 \rightarrow #2 \right)}
+\newcommand{\infseq}[2]{\left\{ #1_{#2} \right\}_{#2 = 1}^{\infty}}
+\newcommand{\dist}[2]{\rho\left(#1, #2\right)}
+
+\renewcommand*{\le}{\leqslant}
+\renewcommand*{\ge}{\geqslant}
+\let\oldforall\forall
+\renewcommand*{\forall}{\oldforall\,}
+\let\oldexists\exists
+\renewcommand*{\exists}{\oldexists\,}
+\newcommand{\tran}{\mathsf{T}}
+\newcommand{\glqqq}{\guillemotleft}
+\newcommand{\grqqq}{\guillemotright}
+\newcommand{\scalar}[2]{\left<#1,#2\right>}
+\newcommand{\norm}[1]{\left\| #1 \right\|}
+\newcommand{\abs}[1]{\left| #1 \right|}
+\newcommand{\real}{\mathbb R}
+\newcommand{\soa}{\mathcal{X}} %Множество достижимости - англ. "set of attainability"
+% 5 команд для пространств Lp, Lq, L1, L2, L\infty
+\newcommand{\Lp}{{\mathcal{L}_p}}
+\newcommand{\Lq}{{\mathcal{L}_q}}
+\newcommand{\LOne}{{\mathcal{L}_1}}
+\newcommand{\LTwo}{{\mathcal{L}_2}}
+\newcommand{\LInf}{{\mathcal{L}_\infty}}
+\newcommand{\eqdef}{\stackrel{\mathrm{def}}{=}}
+\newcommand{\sufu}[2]{\rho\left(#1\,\middle|\,#2\right)}
+\newcommand{\set}[2]{\left\{\, #1 \,\middle|\, #2 \,\right\}}
+
+\renewcommand{\P}{\mathbf{P}}
+
+\DeclareMathOperator{\Ad}{Ad}
+\DeclareMathOperator{\Ann}{Ann}
+\DeclareMathOperator{\Arg}{Arg}
+\DeclareMathOperator{\Argmax}{Argmax}
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator{\area}{area}
+\DeclareMathOperator{\arsh}{arsh}
+\DeclareMathOperator{\Aut}{Aut}
+\DeclareMathOperator{\Card}{Card}
+\DeclareMathOperator{\Char}{char}
+\DeclareMathOperator{\Cl}{Cl}
+\DeclareMathOperator{\codim}{codim}
+\DeclareMathOperator{\Coim}{Coim}
+\DeclareMathOperator{\Com}{Com}
+\DeclareMathOperator{\const}{const}
+\DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\Corr}{corr}
+\DeclareMathOperator{\cov}{cov}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\diam}{diam}
+%\DeclareMathOperator{\dist}{dist}
+\DeclareMathOperator{\Div}{div}
+\DeclareMathOperator{\Dom}{Dom}
+\DeclareMathOperator{\dom}{dom}
+\DeclareMathOperator{\esssup}{esssup}
+\DeclareMathOperator{\grad}{grad}
+\DeclareMathOperator{\Graph}{Graph}
+\DeclareMathOperator{\GCD}{\mathrm{\text{НОД}}}
+\DeclareMathOperator{\End}{End}
+\DeclareMathOperator{\extr}{extr}
+\DeclareMathOperator{\epig}{epi}
+\DeclareMathOperator{\Hom}{Hom}
+\DeclareMathOperator{\id}{id}
+\renewcommand{\Im}{\mathop{\mathrm{Im}}}
+\DeclareMathOperator{\Img}{Im}
+\DeclareMathOperator{\ind}{ind}
+\DeclareMathOperator{\Int}{Int}
+\DeclareMathOperator{\Inn}{Inn}
+\DeclareMathOperator{\Isom}{Isom}
+\DeclareMathOperator{\Ker}{Ker}
+\DeclareMathOperator{\Law}{Law}
+\DeclareMathOperator{\LCM}{\mathrm{\text{НОК}}}
+\DeclareMathOperator{\Lin}{Lin}
+\DeclareMathOperator{\Ln}{Ln}
+\DeclareMathOperator{\mes}{mes}
+\DeclareMathOperator{\Mat}{Mat}
+\DeclareMathOperator{\Orb}{Orb}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\Out}{Out}
+\DeclareMathOperator{\Prj}{Pr}
+\DeclareMathOperator{\Pin}{Pin}
+\DeclareMathOperator{\Quot}{Quot}
+\DeclareMathOperator{\Ran}{Ran}
+\renewcommand{\Re}{\mathop{\mathrm{Re}}}
+\DeclareMathOperator{\Rea}{Re}
+\DeclareMathOperator*{\res}{res}
+\DeclareMathOperator{\rk}{rk}
+\DeclareMathOperator{\rot}{rot}
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\Si}{Si}
+\DeclareMathOperator{\Spec}{Spec}
+\DeclareMathOperator{\Spin}{Spin}
+\DeclareMathOperator{\St}{St}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\Tor}{Tor}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\vp}{v.p.}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\vraimax}{vraimax}
+\DeclareMathOperator{\rg}{rg}
+\DeclareMathOperator{\E}{\mathbb{E}}
+\DeclareMathOperator{\med}{med}
+\renewcommand{\mod}{\mathop{\mathrm{mod}}}
+
+\DeclareMathOperator{\Bi}{Bi}
+\DeclareMathOperator{\negBi}{\overline{Bi}}
+\endinput
