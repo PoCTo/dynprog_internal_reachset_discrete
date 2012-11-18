@@ -65,6 +65,8 @@ u(k)\in \mathbb{R}^m, x(k)\in \mathbb{R}^n.
 Требуется построить внутреннюю эллипсоидальную оценку множества достижимости данной системы.
 
 \section{Теоретическая часть}
+\subsection{Множество достижимости}
+Вначале будем считать, что матрицы $Q(i)$ и $A(i)$ несингулярны, т.е. имеют полный ранг. Случай сингулярных матриц будет разобран позднее.
 \begin{df}
 \textit{Эллипсоидом} $\ell(q,Q), Q\in\mathbb{R}^{n\times n}$ в $n$-мерном пространстве назовём множество точек
 \[ \ell(q,Q) = \left\{ x\colon (x-q)Q^{-1}(x-q)' \leqslant 1 \right\}. \]
@@ -78,9 +80,9 @@ u(k)\in \mathbb{R}^m, x(k)\in \mathbb{R}^n.
 Понятие множества достижимости обобщается на случай произвольной стартовой точки из множества $\mathcal{X}_0$:
 \[ \mathcal{X}(k,k_0,\mathcal{X}_0) = \left\{ x \middle| \exists u(s), k_0\leqslant s\leqslant k\colon x(k|k_0,x_0)\in \mathcal{X} \right\} = \bigcup\limits_{x_0\in\mathcal{X}_0}\mathcal{X}(k,k_0,x_0).\]
 \begin{theorem}
-Решением системы \ref{statement_system} является 
+Решением системы \eqref{statement_system} является 
 \begin{equation}\label{solution}
-	x(k) = \Phi(k,k_0)x_0 + \sum\limits_{i=k_0}^{k-1}\Phi(k,i+1)B(k)u(k),
+	x(k) = \Phi(k,k_0)x_0 + \sum\limits_{i=k_0}^{k-1}\Phi(k,i+1)B(i)u(i),
 \end{equation} 
 где $\Phi(k,p)$ --- переходная матрица:
 \begin{equation}\label{solution}
@@ -89,13 +91,51 @@ u(k)\in \mathbb{R}^m, x(k)\in \mathbb{R}^n.
 \end{theorem}
 \begin{proof}
 	Докажем по индукции. Для $k=k_0+1$ очевидно. Пусть для $k$ показано, тогда для $k+1$
-	проверим подстановкой в \ref{statement_system}:
+	проверим подстановкой в \eqref{statement_system}:
 	\begin{gather*}
-		{x}(k+1) = \Phi(k+1,k_0)x_0 + \sum\limits_{i=k_0}^{k+1-1}\Phi(k+1,i+1)B(k)u(k) = 
-		\\ = A(k)\Phi(k,k_0)x_0 + A(k)\sum\limits_{i=k_0}^{k+1-2}\Phi(k,i+1)B(k)u(k) + 
+		{x}(k+1) = \Phi(k+1,k_0)x_0 + \sum\limits_{i=k_0}^{k+1-1}\Phi(k+1,i+1)B(i)u(i) = 
+		\\ = A(k)\Phi(k,k_0)x_0 + A(k)\sum\limits_{i=k_0}^{k+1-2}\Phi(k,i+1)B(i)u(i) + 
 		\Phi(k+1,k+1)B(k)u(k) = \\ = A(k)x(k) + B(k)u(k).
 	\end{gather*}
 \end{proof}
+\begin{imp}
+	Используя теорему, множество достижимости системы \eqref{statement_system} можно записать следующим образом:
+	\begin{gather}
+		\notag \mathcal{X}(k,k_0,\ell(x_0,X_0)) = q_c(k) + \Phi(k,k_0)\ell(0,X_0) + 
+			\sum\limits_{i=k_0}^{k-1}\Phi(k,i+1)B(i)\ell(0,Q(i)) = \\
+		= q(k) + \Phi(k,k_0)\ell(0,X_0) + 
+			\sum\limits_{i=k_0}^{k-1}\Phi(k,i+1)\ell(0,B(i)Q(i)B(i)'),
+	\end{gather}
+	где \begin{gather}
+		q_c(k) = \Phi(k,k_0)x_0 + \sum\limits_{i=k_0}^{k-1}\Phi(k,i+1)B(i)q(i).
+	\end{gather}
+\end{imp}
+Здесь знак <<$+$>> означает сумму множеств по Минковскому: $A+B= \left\{x+y \middle| x\in A,\, y\in B\right\}$, а умножение множества на матрицу производится по формуле $\Phi A = \left\{ \Phi x\middle| x\in A \right\}.$ Кроме того, использовалось свойство эллипса $\Phi\ell(x,X) = \ell(\Phi x,\Phi X\Phi')$.
+\subsection{Внутренние эллипсоидальные оценки}
+Если умножение на невырожденную матрицу не выводит из класса эллипсоидов, то сумма двух эллипсоидов, вообще говоря, этому классу не принадлежит, поэтому множество достижимости конкретным эллипсоидом записать не получится. Однако возможно эллипсоидальное оценивание этого множества.
+
+Для начала найдем опорную функцию множества достижимости, пользуясь свойством её линейности относительно сумм по Минковскому, а так же тем, что опорная функция эллипсоида $\sufu{l}{\ell(x,X)}$ равна $\scalar{l}{x}+\norm{l}_X^{1/2}$:
+\begin{gather}
+\notag\sufu{l}{\mathcal{X}\left(k,k_0,\ell\left(x_0,X_0\right)\right)} = \sufu{l}{q_c\left(k\right)} + \sufu{l}{\Phi\left(k,k_0\right)\ell\left(0,X_0\right)} +\\ 
+			\notag + 
+			 \sum\limits_{i=k_0}^{k-1}\sufu{l}{\Phi\left(k,i+1\right)B\left(i\right)\ell\left(0,Q\left(i\right)\right)} = 
+			 \scalar{l}{q_c\left(k\right)} + 
+				\sufu{l}{\ell\left(0,\Phi\left(k,k_0\right)X_0\Phi\left(k,k_0\right)'\right)} + \\
+			\notag +\sum\limits_{i=k_0}^{k-1} 
+				\sufu{l}{
+					\ell\left(0,\Phi\left(k,i+1\right)B\left(i\right)Q\left(i\right)B\left(i\right)'\Phi\left(k,i+1\right)'\right)} = 
+			 \scalar{l}{q_c\left(k\right)} +\\+ \scalar{l}{\Phi\left(k,k_0\right)X_0\Phi\left(k,k_0\right)'l}
+			  +
+			\scalar{l}{\Phi\left(k,i+1\right)B\left(i\right)Q\left(i\right)B\left(i\right)'\Phi\left(k,i+1\right)'l}.
+\end{gather}
+
+Найдем теперь оптимальный (в смысле касания заданного множества в направлении $l$) эллипсоид, являющийся внутренней оценкой множества достижимости.
+
+
+
+
+
+
 
 
 
