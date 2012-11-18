@@ -114,7 +114,7 @@ u(k)\in \mathbb{R}^m, x(k)\in \mathbb{R}^n.
 \subsection{Внутренние эллипсоидальные оценки}
 Если умножение на невырожденную матрицу не выводит из класса эллипсоидов, то сумма двух эллипсоидов, вообще говоря, этому классу не принадлежит, поэтому множество достижимости конкретным эллипсоидом записать не получится. Однако возможно эллипсоидальное оценивание этого множества.
 
-Для начала найдем опорную функцию множества достижимости, пользуясь свойством её линейности относительно сумм по Минковскому, а так же тем, что опорная функция эллипсоида $\sufu{l}{\ell(x,X)}$ равна $\scalar{l}{x}+\norm{l}_X^{1/2}$:
+Для начала найдем опорную функцию множества достижимости, пользуясь свойством её линейности относительно сумм по Минковскому, а так же тем, что опорная функция эллипсоида $\sufu{l}{\ell(x,X)}$ равна $\scalar{l}{x}+\norm{l}_X$:
 \begin{gather}
 \notag\sufu{l}{\mathcal{X}\left(k,k_0,\ell\left(x_0,X_0\right)\right)} = \sufu{l}{q_c\left(k\right)} + \sufu{l}{\Phi\left(k,k_0\right)\ell\left(0,X_0\right)} +\\ 
 			\notag + 
@@ -124,13 +124,22 @@ u(k)\in \mathbb{R}^m, x(k)\in \mathbb{R}^n.
 			\notag +\sum\limits_{i=k_0}^{k-1} 
 				\sufu{l}{
 					\ell\left(0,\Phi\left(k,i+1\right)B\left(i\right)Q\left(i\right)B\left(i\right)'\Phi\left(k,i+1\right)'\right)} = 
-			 \scalar{l}{q_c\left(k\right)} +\\+ \scalar{l}{\Phi\left(k,k_0\right)X_0\Phi\left(k,k_0\right)'l}
+			 \scalar{l}{q_c\left(k\right)} +\\+ \scalar{l}{\Phi\left(k,k_0\right)X_0\Phi\left(k,k_0\right)'l}^{1/2}
 			  +
-			\scalar{l}{\Phi\left(k,i+1\right)B\left(i\right)Q\left(i\right)B\left(i\right)'\Phi\left(k,i+1\right)'l}.
+			\scalar{l}{\Phi\left(k,i+1\right)B\left(i\right)Q\left(i\right)B\left(i\right)'\Phi\left(k,i+1\right)'l}^{1/2}.
 \end{gather}
 
-Найдем теперь оптимальный (в смысле касания заданного множества в направлении $l$) эллипсоид, являющийся внутренней оценкой множества достижимости.
-
+\begin{theorem}
+Эллипсоид, являющийся внутренней оценкой суммы $\ell(0,Q_1)+\dots+\ell(0,Q_n)$, имеет матрицу
+\begin{equation}\label{th:ell} Q = Q_*'Q_*,\quad Q_*=\sum\limits_{1}^{n} S_kQ_k^{1/2},\ S_kS'_k=I, \end{equation}
+причем для оптимальности (в смысле касания заданного множества в направлении $l$) необходима и достаточна линейная зависимость векторов $S_kQ_k^{1/2}l,\ k=1,\dots,n.$
+\end{theorem}
+\begin{proof}
+Для доказательства внутренности оценки достаточно показать, что опорная функция эллипсоида с матрицей \eqref{th:ell} всюду меньше опорной функции суммы эллипсоидов. Сравним квадраты опорных функций и воспользуемся неравенством о средних и неравенством Коши-Буняковского:
+\begin{align*}
+\sufu{l}{\ell(0,Q)} &=  
+\end{align*}
+\end{proof}
 
 
 
