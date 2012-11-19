@@ -21,24 +21,24 @@
 
 %\vspace{5cm}
 \vfill
-{\LARGE Курсовая работа}
+{\LARGE Отчет по практикуму}
 
 \vspace{1cm}
 
-{\Huge\bfseries <<Изучение динамических систем>>}
+{\Huge\bfseries <<Динамическое программирование \\ и процессы управления>>}
 \end{center}
 
 \vspace{2cm}
 
 \begin{flushright}
   \large
-  \textit{Студент 315 группы}\\
+  \textit{Студент 415 группы}\\
   Д.~И.~Степенский
 
   \vspace{5mm}
 
   \textit{Руководитель практикума}\\
-  к.ф.-м.н., ассистент П.~А.~Точилин
+  асс. Ю.~Ю.~Минаева
 \end{flushright}
 
 \vfill
@@ -66,7 +66,7 @@ u(k)\in \mathbb{R}^m, x(k)\in \mathbb{R}^n.
 
 \section{Теоретическая часть}
 \subsection{Множество достижимости}
-Вначале будем считать, что матрицы $Q(i)$ и $A(i)$ несингулярны, т.е. имеют полный ранг. Случай сингулярных матриц будет разобран позднее.
+Вначале будем считать, что матрицы $B(i)Q(i)B(i)'$ и $A(i)$ несингулярны, т.е. имеют полный ранг. Случай сингулярных матриц будет разобран позднее.
 \begin{df}
 \textit{Эллипсоидом} $\ell(q,Q), Q\in\mathbb{R}^{n\times n}$ в $n$-мерном пространстве назовём множество точек
 \[ \ell(q,Q) = \left\{ x\colon (x-q)Q^{-1}(x-q)' \leqslant 1 \right\}. \]
@@ -129,7 +129,7 @@ u(k)\in \mathbb{R}^m, x(k)\in \mathbb{R}^n.
 			\scalar{l}{\Phi\left(k,i+1\right)B\left(i\right)Q\left(i\right)B\left(i\right)'\Phi\left(k,i+1\right)'l}^{1/2}.
 \end{gather}
 Заметим, что если предположить, что центры всех эллипсов нулевые, то из \eqref{th:ellipsoids_follow} исчезнет лишь первое слагаемое.
-\begin{theorem}
+\begin{theorem}\label{th_st:internal}
 Эллипсоид, являющийся внутренней оценкой суммы $\ell(0,Q_1)+\dots+\ell(0,Q_n)$, имеет матрицу
 \begin{equation}\label{th:ell} Q = Q_*'Q_*,\quad Q_*=\sum\limits_{1}^{n} S_kQ_k^{1/2},\ S_kS'_k=I, \end{equation}
 причем для оптимальности (в смысле касания заданного множества в направлении $l$) необходима и достаточна линейная зависимость векторов $S_kQ_k^{1/2}l,\ k=1,\dots,n.$
@@ -148,12 +148,72 @@ u(k)\in \mathbb{R}^m, x(k)\in \mathbb{R}^n.
 Равенство в неравенстве Коши-Буняковского, то есть оптимальность в смысле касания, достигается тогда и только тогда, когда линейно зависимы векторы $S_kQ_k^{1/2}l$.
 \end{proof}
 
+Из описанного выше следует теорема об аппроксимации множества достижимости системы \eqref{statement_system}.
+\begin{theorem}
+\[\mathcal{X}\left(k,k_0,\ell\left(x_0,X_0\right)\right) = 
+	\bigcup\limits_{l}\ell\left( q_c(k), Q(l) \right), \]
+	где $Q$ задается \eqref{th:ell}, и 
+	\begin{equation}
+		Q_*(l) = \left( \left(SX_0S'\right)^{1/2} + \sum\limits_{k_*=k_0}^{k-1}S_{k_*}\left(\Phi(k_0,k_*+1)B(k_*)Q(k_*)B(k_*)'\Phi(k_0,k_*+1)'\right)^{1/2} \right) 
+		\Phi(k,k_0)'
+	\end{equation}
+\end{theorem}
+\begin{proof}
+	Так как для касания по направлению $l$ требуется линейная зависимость $S\left(\Phi\left(k,k_0\right)X_0\Phi\left(k,k_0\right)'\right)^{1/2}l$ и $S_{k_*}\left(\Phi\left(k,k_*+1\right)B\left(k_*\right)Q\left(k_*\right)B\left(k_*\right)'\Phi\left(k,k_*+1\right)'\right)^{1/2}l$  (где $S$ и  $S_{k_*}$ ортогональны) для всех $k_0 \leqslant k_* \leqslant k-1$, то по некоторым заданным $\lambda_{k_*}>0$ (например, натуральным) и ортогональной $S$ (например, $S=I$) можно получить из выражения с $X_0$ выражения с $Q(k_*)$ простым умножением на $\lambda_{k_*}$ и при таком определении эти матрицы будут удовлетворять условию равенства в неравенстве Коши-Буняковского из теоремы \ref{th_st:internal}. Поэтому, вообще говоря, внутренние приближения зависят лишь от $l$.
 
+Доказательство самой теоремы теперь проведем двусторонним вложением. Имеем вложенность правой части условия в левую, поскольку все оценки --- внутренние. Вложенность же левой в правую получается из следующих соображений: для произвольного $x \in \mathcal{X}\left(k,k_0,\ell\left(x_0,X_0\right)\right)$ рассмотрим вектор $l = x - q_c(k)$. Для такого $l$ существует внутренняя эллипсоидальная оценка, которая касается $\mathcal{X}\left(k,k_0,\ell\left(x_0,X_0\right)\right)$ по направлению $l$. Но тогда эта оценка содержит весь отрезок от $q_c(k)$ до точки касания, а точка $x$ лежит на этом отрезке, а значит, принадлежит и правой части.
+\end{proof}
+\begin{note}
+Заметим, что везде выше использовалось лишь свойство корня симметричной матрицы $Q^{1/2}\left(Q'\right)^{1/2} = Q$, поэтому мы вправе (то есть выкладки не изменятся) определить квадратный корень из матрицы $S$, необязательно симметричной, как матрицу $S^{1/2}$ такую, что $S^{1/2}\left(S'\right)^{1/2} = S$. Вообще говоря, такой корень может быть не единственным, но это не имеет значения при данной задаче.
+\end{note}
+Теперь можно записать более краткий вид корней описанных в теореме матриц: 
+\begin{gather}
+	\label{root_formula1} S\left(\Phi\left(k,k_0\right)X_0\Phi\left(k,k_0\right)'\right)^{1/2}l =
+		SX_0^{1/2}\Phi(k,k_0)'l, \\ 
+	\notag S_{k_*}\left(\Phi\left(k,k_*+1\right)B\left(k_*\right)Q\left(k_*\right)B\left(k_*\right)'\Phi\left(k,k_*+1\right)'\right)^{1/2}l 
+		=  S_{k_*}Q^{1/2}B(k_*)'\Phi\left(k,k_*+1\right)'l = \\
+		\label{root_formula2} = \lambda_{k_*} SX_0^{1/2}\Phi(k,k_0)'l.
+\end{gather}
+Кроме того, можно формула для $\lambda$ будет иметь вид (получено из рассмотрения норм левой и правой части последнего равенства в \eqref{root_formula2}, учитывая ортогональность $S$ и $S_{k_*}$)
+\begin{equation}\label{lambdas}
+	\lambda_{k_*} = \frac {\scalar{l}{\Phi\left(k,k_*+1\right)B\left(k_*\right)Q\left(k_*\right)B\left(k_*\right)'\Phi\left(k,k_*+1\right)'l}^{1/2}}{\scalar{l}{\Phi\left(k,k_0\right)X_0\Phi\left(k,k_0\right)'l}^{1/2}}
+\end{equation}
+\begin{note}
+Из последних формул видно, что при переходе $k$ к $k+1$ придётся пересчитывать значения $S_{k_*}$ и $\lambda_{k_*}$ для всех $k_*$, так как эти величины зависят от $k$, что значительно увеличивает объем вычислений. Для уменьшения количества операций рассмотрим параметризованное значение $l(k)$, удовлетворяющее 
+	\begin{equation}\label{newl}
+		l(k)=\Phi(k_0,k)'l(k_0) = \Phi(k_0,k)'l_0.
+	\end{equation}
+	Перепишем в этом случае \eqref{root_formula2} и \eqref{lambdas}:
+	\begin{gather}
+		S_{k_*}Q^{1/2}(k_*)B(k_*)'\Phi\left(k_0,k_*+1\right)'l = \lambda_{k_*}SX_0^{1/2}l_0, \\
+		\lambda_{k_*} =
+			 \frac{\scalar{l}{\Phi(k_0,k_*+1)B(k_*)Q(k_*)B(k_*)'\Phi\left(k_0,k_*+1\right)'l}^{1/2} }
+			{\scalar{l}{X_0l}^{1/2} }
+	\end{gather}	
+	Заметим, что так как оператор $Ф(k_0,k)$ невырожден, то если $l_0$ <<заметает>>  все возможные направления, то и $l(k)$ в любой момент времени обладает этим свойством.
+\end{note}
 
-
-
-
-
+\begin{theorem}
+Для расчета при увеличении интервала времени можно использовать рекурсивную формулу
+	\begin{gather}
+		\notag Q(k+1) = Q(k) + \Phi(k+1,k_0)B(k)Q(k)B(k)'\Phi(k+1,k_0)' + \Phi(k+1,k_0)\cdot \\
+		\cdot \left( M_k S_k Q^{1/2}(k)B(k)'\Phi(k_0,k+1)' + Q^{1/2}(k)B(k)'\Phi(k_0,k+1)'S_k'M_k' \right) \cdot \Phi(k+1,k_0)',
+	\end{gather}
+	причём
+	\begin{gather}
+		Q(k_0) = X_0,\\
+		M_k = X_0^{1/2}S'+\sum\limits_{i=k_0}^{k-1}Q^{1/2}(i)B(i)'\Phi(k_0,i+1)'S_i'.
+	\end{gather}
+\end{theorem}
+\begin{proof}
+Данный результат получается при подстановке значений матриц эллипсоидов, составляющих множество достижимости в следующее равенство ($H_i$ --- матрицы некоторых эллипсоидов):
+\begin{gather}
+	Q(k+1) = \left(\sum\limits_{i=0}^{k+1}S_iH_i^{1/2}\right)'\left(\sum\limits_{i=0}^{k+1}S_iH_i^{1/2}\right) = \\
+	= \left(\sum\limits_{i=0}^{k}S_iH_i^{1/2} + S_{k+1}H_{k+1}^{1/2} \right)'\left(\sum\limits_{i=0}^{k}S_iH_i^{1/2} + S_{k+1}H_{k+1}^{1/2}\right) = \\
+	= Q(k) + H_{k+1} + \left(\sum\limits_{i=0}^{k}S_iH_i^{1/2}\right)' S_{k+1}H_{k+1}^{1/2} +
+	\left(  S_{k+1}H_{k+1}^{1/2} \right)'\left(\sum\limits_{i=0}^{k}S_iH_i^{1/2}\right)
+\end{gather}
+\end{proof}
 
 
 
