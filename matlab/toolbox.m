@@ -7,10 +7,10 @@ function tube = toolbox(l_1, l_2, k_0, k_1, N_directions)
 %m_tool = X_0_c();
 %M_tool = X_0();
 syms k;
-A_tool(k)=sym(A);
-B_tool(k)=sym(B);
-Q_tool(k)=sym(Q);
-q_tool(k)=sym(Q_c);
+%A_tool(k)=sym(A);
+%B_tool(k)=sym(B);
+%Q_tool(k)=sym(Q);
+%q_tool(k)=sym(Q_c);
 Q_str = struct('center','','shape','');
 Q_str.center = Q_c
 Q_str.shape = Q

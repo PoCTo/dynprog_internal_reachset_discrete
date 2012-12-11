@@ -2,15 +2,15 @@ function [approximations, reach_ellipses] = ...
                 no_good_curves(l_1, l_2, k_0, k_1, directions_count)
 
 syms k;
-%A_s(k)=sym(A);
-%B_s(k)=sym(B);
-%Q_s(k)=sym(Q);
-%Q_c_s(k)=sym(Q_c);
+A_s(k)=sym(A);
+B_s(k)=sym(B);
+Q_s(k)=sym(Q);
+Q_c_s(k)=sym(Q_c);
 
-A_sym = @(t)subs(A,k,t);
-B_sym = @(t)subs(B,k,t);
-Q_sym = @(t)subs(Q,k,t);
-Q_c_sym = @(t)subs(Q_c,k,t);
+A_sym = @(t)double(A_s(t));
+B_sym = @(t)double(B_s(t));
+Q_sym = @(t)double(Q_s(t));
+Q_c_sym = @(t)double(Q_c_s(t));
 
 to_array=@(k)(k-k_0+1);
             
