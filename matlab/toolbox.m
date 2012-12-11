@@ -11,11 +11,13 @@ A_tool(k)=sym(A);
 B_tool(k)=sym(B);
 Q_tool(k)=sym(Q);
 q_tool(k)=sym(Q_c);
-Q_str = struct('center',q_tool(k),'shape',Q_tool(k));
+Q_str = struct('center','','shape','');
+Q_str.center = Q_c
+Q_str.shape = Q
 
 % A_tool = {'sin(k)' '0' '0'; '1/2*cos(k)' '0' '1/2*cos(k)'; '0' 'sin(k)' '0'}
 
-dim = size(A_tool, 1);
+dim = size(A, 1)
 
 e_1 = l_1 / norm(l_1);
 e_2 = l_2 - e_1 * (e_1' * l_2);
@@ -26,7 +28,7 @@ for i = 1:N_directions
   Ell{i} = Ell{i} / norm(Ell{i});
 end
 Ell = cell2mat(Ell');
-ls = linsys(A, B_tool, Q_str, [], [], [], [], 'd');
+ls = linsys(A, B, Q_str, [], [], [], [], 'd');
 r = reach(ls, ellipsoid(X_0_c, X_0), Ell', [k_0 k_1]);
 tube = projection(r,[e_1';e_2']');
 
