@@ -1,81 +1,96 @@
-function [reach_tube, reach_ellipses] = ...
+function [approximations, reach_ellipses] = ...
                 no_good_curves(l_1, l_2, k_0, k_1, directions_count)
-some_A_value = A(k_0);
+
+syms k;
+A_s(k)=sym(A);
+B_s(k)=sym(B);
+Q_s(k)=sym(Q);
+Q_c_s(k)=sym(Q_c);
+
+A_sym = @(t)double(A_s(t));
+B_sym = @(t)double(B_s(t));
+Q_sym = @(t)double(Q_s(t));
+Q_c_sym = @(t)double(Q_c_s(t));
+
+to_array=@(k)(k-k_0+1);
+            
+some_A_value = A_sym(k_0);
 n = size(some_A_value, 1);
 
 % assuming k_1 >= k_0
 t_count = k_1 - k_0 + 1;
 
-As = zeros(n, n, t_count);
-As(:,:,1) = some_A_value;
+As = cell(t_count,1);
+As{1} = some_A_value;
 for (i = (k_0+1):k_1)
     %[i - k_0 + 1]
-    As(:,:,i - k_0 + 1) = A(i);
+    As{to_array(i)} = A_sym(i);
 end
     
-Fundamentals = zeros(n,n,t_count,t_count);
+Fundamentals = cell(t_count,t_count);
 for (i = 1:t_count)
-    Fundamentals(:,:,i,i) = eye(n,n);
+    Fundamentals{i,i} = eye(n,n);
     %[i,i]
 end
 for (i = k_0:k_1)
     for (j = (i+1):k_1)
-        Fundamentals(:,:,i-k_0+1,j-k_0+1) = ...
-            As(:,:,j-k_0) * Fundamentals(:,:,i-k_0+1,j-k_0);
+        Fundamentals{to_array(i),to_array(j)} = ...
+            As{to_array(j-1)} * Fundamentals{to_array(i),to_array(j-1)};
         %[i-k_0+1,j-k_0+1]
     end
 end
 
 % Normalized random directions
-directions = rand(n, directions_count);
-norms = arrayfun(@(i)norm(directions(:,i)),1:directions_count);
-directions = directions ./ repmat(norms,n,1);
+directions = cell(directions_count);
+for i=1:directions_count
+    directions{i} = rand(n,1);
+    directions{i} = directions{i}/norm(directions{i});
+end
 
-centers = zeros(n, t_count);
-centers(:,1) = X_0_c;
+centers = cell(t_count);
+centers{1} = X_0_c;
+
+fund = @(x,y)Fundamentals{to_array(y),to_array(x)};
 
 for (k=(k_0 + 1):k_1)
-    i = k - k_0 + 1;
-    centers(:,i) = Fundamentals(1, i)*X_0_c;
-    for (j = k_0:k-1)
+    centers{to_array(k)} = fund(k, k_0)*X_0_c;
+    for (i = k_0:k-1)
         %Fundamentals(:,:,j+1-k_0+1,i)
         % B(j-k_0+1)
         % Q_c(j-k_0+1)
-        centers(:,i) = centers(:,i) + Fundamentals(:,:,j+1-k_0+1,i)*...
-            B(j-k_0+1)*Q_c(j-k_0+1);
+        centers{to_array(k)} = centers{to_array(k)} + fund(k,i+1)*B_sym(i)*Q_c_sym(i);
     end
 end
 
-ellipses = zeros(n, n, t_count, directions_count);
+ellipses = cell(t_count, directions_count);
 for (i=1:directions_count)
-    ellipses(:,:,1,i) = X_0;
+    ellipses{1,i} = X_0;
 end
 
-approximations = cell(t_count);
-approximations{1} = ellipsoidalProjection(X_0_c,X_0,l_1,l_2,200);
+approximations = cell(t_count,1);
+approximations{1} = ellipsoidalProjection(X_0_c,X_0,l_1,l_2,100);
 
 for (k=(k_0+1):k_1) % t_count
     border_set = cell(1, directions_count);
-    i = k - k_0 + 1;
     S = eye(n,n);
     for (j=1:directions_count)
-        ellipses(:,:,i,j) = S*sqrtm(X_0);
-        for (k_star=k_0:(k-1))
-            i_star = k_star-k_0+1; % i_star
-            l = directions(:,j);
-            l_k_star = sqrt(dot(l,...
-                Fundamentals(:,:,1,i_star)*B(k_star)*Q(k_star)*...
-                    B(k_star)'*Fundamentals(:,:,1,i_star)'*directions(:,j))/...
-                        dot(l,Fundamentals(:,:,1,i_star)*X_0*Fundamentals(:,:,1,i_star)'*l));
-            ellipses(:,:,i,j) = ellipses(:,:,i,j) + ...
-                l_k_star*S*sqrtm(X_0);
+        ellipses{to_array(k),j} = 1;
+        l = directions{j};
+        for (i=k_0:(k-1))
+            lambda_i = sqrt(dot(l,...
+                fund(k,i+1)*B_sym(i)*Q_sym(i)*...
+                    (B_sym(i)')*(fund(k,i+1)')*l));
+            lambda_i = lambda_i / sqrt(dot(l,fund(k,k_0)*X_0*(fund(k,k_0)')*l));
+            ellipses{to_array(k),j} = ellipses{to_array(k),j} + ...
+                lambda_i;
         end
-        ellipses(:,:,i,j) = ellipses(:,:,i,j)*Fundamentals(:,:,1,i)';
-        ellipses(:,:,i,j) = ellipses(:,:,i,j)'*ellipses(:,:,i,j);
-        ellipses(:,:,i,j)
-        border_set{1,j} = ...
-            ellipsoidalProjection(centers(:,i),ellipses(:,:,i,j),...
-                l_1, l_2, 200);
+        ellipses{to_array(k),j} = ellipses{to_array(k),j}*S*sqrtm(X_0)*(fund(k,k_0)');
+        ellipses{to_array(k),j} = (ellipses{to_array(k),j}')*ellipses{to_array(k),j};
+        ellipses{to_array(k),j};
+        
+        border_set{j} = ...
+            ellipsoidalProjection(centers{to_array(k)},ellipses{to_array(k),j},...
+                l_1, l_2, 100);
     end
     xs = border_set{1}(1, :);
     ys = border_set{1}(2, :);
@@ -88,7 +103,7 @@ for (k=(k_0+1):k_1) % t_count
         [xs,ys] = polybool('union',xs,ys,...
             border_set{r}(1,:),border_set{r}(2,:));
     end
-    approximations{i} = [xs; ys];
+    approximations{to_array(k)} = [xs; ys];
     %[xs;ys]
 end
 
@@ -99,8 +114,15 @@ hold on;
 for k = k_0:k_1
   k_sh = k-k_0+1;
   len = size(approximations{k_sh}, 2);
-
-  mesh(linspace(k-1, k, len)'*ones(1, len), ...
+  leftk=k-1/2;
+  rightk=k+1/2;
+  if (k==k_0)
+      leftk=k;
+  elseif (k==k_1)
+      rightk=k;
+  end
+     [leftk,rightk] 
+  mesh(linspace(leftk, rightk, len)'*ones(1, len), ...
        ones(1, len)'*approximations{k_sh}(1, :),...
        ones(1, len)'*approximations{k_sh}(2, :));
   grid on

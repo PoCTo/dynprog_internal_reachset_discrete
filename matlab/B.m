@@ -1,2 +1,2 @@
-function b = B(k)
-b = [1 1; 1 1; 1 1];
+function b = B
+b = '[0 0; 0 0; 0 0]';
