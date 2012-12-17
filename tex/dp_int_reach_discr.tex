@@ -185,20 +185,20 @@ u(k)\in \mathbb{R}^m, x(k)\in \mathbb{R}^n.
 		l(k)=\Phi(k_0,k)'l(k_0) = \Phi(k_0,k)'l_0.
 	\end{equation}
 	Перепишем в этом случае \eqref{root_formula2} и \eqref{lambdas}:
-	\begin{gather}
+	\begin{gather}\label{new_lambdas}
 		S_{k_*}Q^{1/2}(k_*)B(k_*)'\Phi\left(k_0,k_*+1\right)'l = \lambda_{k_*}SX_0^{1/2}l_0, \\
 		\lambda_{k_*} =
 			 \frac{\scalar{l}{\Phi(k_0,k_*+1)B(k_*)Q(k_*)B(k_*)'\Phi\left(k_0,k_*+1\right)'l}^{1/2} }
 			{\scalar{l}{X_0l}^{1/2} }
 	\end{gather}	
-	Заметим, что так как оператор $Ф(k_0,k)$ невырожден, то если $l_0$ <<заметает>>  все возможные направления, то и $l(k)$ в любой момент времени обладает этим свойством.
+	Заметим, что так как оператор $\Phi(k_0,k)$ невырожден, то если $l_0$ <<заметает>>  все возможные направления, то и $l(k)$ в любой момент времени обладает этим свойством.
 \end{note}
 
 \begin{theorem}
 Для расчета при увеличении интервала времени можно использовать рекурсивную формулу
 	\begin{gather}
-		\notag Q(k+1) = Q(k) + \Phi(k+1,k_0)B(k)Q(k)B(k)'\Phi(k+1,k_0)' + \Phi(k+1,k_0)\cdot \\
-		\cdot \left( M_k S_k Q^{1/2}(k)B(k)'\Phi(k_0,k+1)' + Q^{1/2}(k)B(k)'\Phi(k_0,k+1)'S_k'M_k' \right) \cdot \Phi(k+1,k_0)',
+		\notag Q(k+1) = Q(k) + \left(\Phi(k+1,k_0)B(k)Q(k)B(k)'\Phi(k+1,k_0)'\right) + \Phi(k+1,k_0)\cdot {}\\
+		{} \cdot \left( M_k S_k Q^{1/2}(k)B(k)'\Phi(k_0,k+1)' + Q^{1/2}(k)B(k)'\Phi(k_0,k+1)'S_k'M_k' \right) \cdot \Phi(k+1,k_0)',
 	\end{gather}
 	причём
 	\begin{gather}
@@ -212,10 +212,9 @@ u(k)\in \mathbb{R}^m, x(k)\in \mathbb{R}^n.
 	Q(k+1) = \left(\sum\limits_{i=0}^{k+1}S_iH_i^{1/2}\right)'\left(\sum\limits_{i=0}^{k+1}S_iH_i^{1/2}\right) = \\
 	= \left(\sum\limits_{i=0}^{k}S_iH_i^{1/2} + S_{k+1}H_{k+1}^{1/2} \right)'\left(\sum\limits_{i=0}^{k}S_iH_i^{1/2} + S_{k+1}H_{k+1}^{1/2}\right) = \\
 	= Q(k) + H_{k+1} + \left(\sum\limits_{i=0}^{k}S_iH_i^{1/2}\right)' S_{k+1}H_{k+1}^{1/2} +
-	\left(  S_{k+1}H_{k+1}^{1/2} \right)'\left(\sum\limits_{i=0}^{k}S_iH_i^{1/2}\right)
+	\left(  S_{k+1}H_{k+1}^{1/2} \right)'\left(\sum\limits_{i=0}^{k}S_iH_i^{1/2}\right).
 \end{gather}
 \end{proof}
-
 
 
 
