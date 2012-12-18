@@ -39,12 +39,28 @@ end
 
 % Normalized random directions
 directions = cell(directions_count);
+angles = linspace(0,2*pi,directions_count);
+  e_1 = l_1 / norm(l_1);
+  e_2 = l_2 - e_1 * (e_1' * l_2);
+  e_2 = e_2 / norm(e_2);
+  e_1
+  e_2
 for i=1:directions_count
-    directions{i} = rand(n,1);
-    directions{i} = directions{i}/norm(directions{i});
+    directions{i} = rand(n,1)*2 - 1;
+    
+    directions{i} = (e_1*sin(angles(i))+e_2*cos(angles(i)));
+    %directions{i} = directions{i}/norm(directions{i});
+    directions{i}
 end
-directions{1} = l_1;
-directions{2} = l_2;
+
+% % Normalized random directions
+% directions = cell(directions_count);
+% for i=1:directions_count
+%     directions{i} = rand(n,1);
+%     directions{i} = directions{i}/norm(directions{i});
+% end
+% directions{1} = l_1;
+% directions{2} = l_2;
 
 centers = cell(t_count);
 centers{1} = X_0_c;
@@ -122,7 +138,7 @@ for (k=(k_0+1):k_1)
     %ys = ys(end:-1:1);
     for r = 2:directions_count
         [border_set{to_array(k),r}(1,:),border_set{to_array(k),r}(2,:)] = ...
-            poly2cw(border_set{to_array(k),r}(1,:),border_set{to_array(k),r}(2,:));
+            poly2cw((border_set{to_array(k),r}(1,:)),(border_set{to_array(k),r}(2,:)));
         [xs,ys] = polybool('union',xs,ys,...
             border_set{to_array(k),r}(1,:),border_set{to_array(k),r}(2,:));
     end

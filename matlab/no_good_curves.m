@@ -53,9 +53,18 @@ waitbar(step/steps,h);
 
 % Normalized random directions
 directions = cell(directions_count);
+angles = linspace(0,2*pi,directions_count);
+  e_1 = l_1 / norm(l_1);
+  e_2 = l_2 - e_1 * (e_1' * l_2);
+  e_2 = e_2 / norm(e_2);
+  e_1
+  e_2
 for i=1:directions_count
     directions{i} = rand(n,1)*2 - 1;
-    directions{i} = directions{i}/norm(directions{i});
+    
+    directions{i} = (e_1*sin(angles(i))+e_2*cos(angles(i)));
+    %directions{i} = directions{i}/norm(directions{i});
+    directions{i}
 end
 
 centers = cell(t_count);
