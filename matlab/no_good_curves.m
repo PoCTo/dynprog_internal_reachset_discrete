@@ -62,7 +62,7 @@ angles = linspace(0,2*pi,directions_count);
 for i=1:directions_count
     directions{i} = rand(n,1)*2 - 1;
     
-    directions{i} = (e_1*sin(angles(i))+e_2*cos(angles(i)));
+    %directions{i} = (e_1*sin(angles(i))+e_2*cos(angles(i)));
     %directions{i} = directions{i}/norm(directions{i});
     directions{i}
 end

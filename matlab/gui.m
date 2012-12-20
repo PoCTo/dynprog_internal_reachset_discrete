@@ -22,7 +22,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 16-Dec-2012 05:47:59
+% Last Modified by GUIDE v2.5 20-Dec-2012 04:32:43
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -187,7 +187,28 @@ for (i = 1:directions_count)
     plot(coords(1,:),coords(2,:),color);
     hold on;
 end
+  if (choice == 2)
+%      proj = projection(opts.directions{k_1-k_0+1}{1:directions_count},l_1,l_2);
+%      for i = 1:length(proj)
+%          l = proj{i};
+          plot(opts.directions(1,:,k_1-k_0+1),opts.directions(2,:,k_1-k_0+1),'og');
+%      end
+        axes(handles.axesApproximation);
+        for i = 2:k_1-k_0+1
+            plot3((k_0+i-1-0.5)*ones(length(opts.directions(2,:,i)),1),opts.directions(1,:,i),opts.directions(2,:,i),'og',...
+                'MarkerSize', 6, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'g');        
+        end
+        for i = 1:directions_count+1
+            lss = reshape(opts.directions(1,i,2:end),[k_1-k_0 1 1]);
+            lss2 = reshape(opts.directions(2,i,2:end),[k_1-k_0 1 1]);
+            plot3(1-0.5:1:k_1-0.5,lss,lss2,...
+                 'LineWidth',4);
+        end
+  end
+%plot(opts.approximations(k_1-k_0+1)(2,:))
 %if (handles.menuSolver)
+
+
 
 function editK0_Callback(hObject, eventdata, handles)
 % hObject    handle to editK0 (see GCBO)
@@ -310,3 +331,13 @@ function checkboxHold_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkboxHold
+
+
+% --- Executes on button press in pushbutton2.
+function pushbutton2_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+axes(handles.axesApproximation)
+saveas(gca, 'approx.eps', 'psc2')
+saveas(gca, 'ellips.eps', 'psc2')

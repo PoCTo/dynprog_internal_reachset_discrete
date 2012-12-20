@@ -1,4 +1,4 @@
-function [approximations, centers, ellipses, ls] = ...
+function [approximations, centers, ellipses, points] = ...
                 good_curves(l_1, l_2, k_0, k_1, directions_count)
 syms k;
 %A_s(k)=sym(A);
@@ -37,6 +37,8 @@ for i=k_0+1:k_1
     Fundamentals{to_array(i)} = A_sym(i-1)*Fundamentals{to_array(i-1)};
 end
 
+directions_count = directions_count + 1;
+
 % Normalized random directions
 directions = cell(directions_count);
 angles = linspace(0,2*pi,directions_count);
@@ -45,13 +47,15 @@ angles = linspace(0,2*pi,directions_count);
   e_2 = e_2 / norm(e_2);
   e_1
   e_2
-for i=1:directions_count
+for i=1:directions_count-1
     directions{i} = rand(n,1)*2 - 1;
     
-    directions{i} = (e_1*sin(angles(i))+e_2*cos(angles(i)));
+    directions{i} = (e_1*cos(angles(i))+e_2*sin(angles(i)));
     %directions{i} = directions{i}/norm(directions{i});
     directions{i}
 end
+
+directions{directions_count} = e_2;
 
 % % Normalized random directions
 % directions = cell(directions_count);
@@ -75,10 +79,10 @@ for (k=(k_0 + 1):k_1)
 end
 
 ellipses = cell(t_count, directions_count);
-ls = cell(t_count);
-for i=1:t_count
-    ls{i} = directions;
-end
+% ls = cell(t_count);
+% for i=1:t_count
+%     ls{i} = directions;
+% end
 for (i=1:directions_count)
     ellipses{1,i} = X_0;
 end
@@ -91,45 +95,89 @@ S = eye(n,n);
 x0s = sqrtm(X_0+eye(n,n)*1e-6)*S';
 border_set = cell(t_count, directions_count);
 
-for dir=1:directions_count
-    for k=(k_0+1):k_1
-        ls{to_array(k)}{dir} = fund(k)*directions{dir};
-    end
-end
+% for dir=1:directions_count
+%     for k=(k_0+1):k_1
+%         ls{to_array(k)}{dir} = fund(k)*directions{dir};
+%     end
+% end
 step = step+t_count;
 waitbar(step/steps,h);
 
+points = zeros(2,directions_count, t_count);
+find_support_point = @(q,Q,ell) q + Q * ell / sqrt(ell' * Q * ell);
 
 for dir=1:directions_count
     l = directions{dir};
-    M_k = sqrtm(X_0+eye(n,n)*1e-6);
+    M_k = sqrtm(X_0+eye(n,n)*1e-8);
     S = eye(n,n);
     S_k = S;
     
-    for k=(k_0):(k_1-1)
+    for p=(k_0):(k_1-1)
+        ps = to_array(p);
+        k = p;
+        fkp1 = fund(k+1);
+        fkp1r = pinv(fund(k+1));
+        S_k = generate_rotation_matrix( ...
+                S*sqrtm(X_0+eye(n,n)*1e-8)*l,...
+                   sqrtm(fund(p+1)*...
+                        B_sym(p)*Q_sym(p)*(B_sym(p)')*...
+                   (fund(p+1)')+eye(n,n)*1e-8)*l ...
+            );
         
-        ellipses{to_array(k+1),dir} = A_sym(k)*ellipses{to_array(k),dir}*(A_sym(k)') + ...
-            ((B_sym(k))*Q_sym(to_array(k))*(B_sym(k)'))...
-               + ...
-            fund(k+1)*(M_k*S_k*sqrtm(B_sym(k)*Q_sym(k)*(B_sym(k)')+eye(n,n)*1e-6)*(pinv(fund(k+1))')+...
-            sqrtm(B_sym(k)*Q_sym(k)*(B_sym(k)')+eye(n,n)*1e-6)*(pinv(fund(k+1))')*(S_k')*(M_k'))*...
-            (fund(k+1)');
+        newsqrt = sqrtm(...
+                        fkp1r*...
+                        B_sym(p)*Q_sym(p)*(B_sym(p)')*...
+                        (fkp1r')+eye(n,n)*1e-8...
+                        );
         
-        M_k = M_k + sqrtm(B_sym(k)*Q_sym(k)*(B_sym(k)')+eye(n,n)*1e-6)*(fund(k+1)')*S_k;
-        S_k = generate_rotation_matrix(S*sqrtm(X_0+eye(n,n)*1e-6)*l,...
-            sqrtm(B_sym(k)*Q_sym(k)*(B_sym(k)')+eye(n,n)*1e-6)*pinv(fund(k+1)')*l);
-      
+        ellipses{ps+1,dir} =...
+            A_sym(k)*ellipses{ps,dir}*(A_sym(k)') + ...
+            B_sym(p)*Q_sym(p)*(B_sym(p)') + ...
+            fkp1*(...
+                M_k * S_k * newsqrt...
+                +... 
+                newsqrt * (S_k') * (M_k')...                        
+            )*(fkp1');        
+        M_k = M_k + ...
+            sqrtm(...
+                fkp1r*B_sym(p)*Q_sym(p)*(B_sym(p)')*(fkp1r')+eye(n,n)*1e-8)...
+                *(S_k');
         
-        l1 = ls{to_array(k)+1}{1}/norm(ls{to_array(k)+1}{1});
-        l2 = ls{to_array(k)+1}{2}/norm(ls{to_array(k)+1}{2});
+%         ellipses{to_array(k+1),dir} = A_sym(k)*ellipses{to_array(k),dir}*(A_sym(k)') + ...
+%             ((B_sym(k))*Q_sym(to_array(k))*(B_sym(k)'))...
+%                + ...
+%             fund(k+1)*(M_k*S_k*sqrtm(B_sym(k)*Q_sym(k)*(B_sym(k)')+eye(n,n)*1e-6)*(pinv(fund(k+1))')+...
+%             sqrtm(B_sym(k)*Q_sym(k)*(B_sym(k)')+eye(n,n)*1e-6)*(pinv(fund(k+1))')*(S_k')*(M_k'))*...
+%             (fund(k+1)');
+%         
+%         M_k = M_k + sqrtm(B_sym(k)*Q_sym(k)*(B_sym(k)')+eye(n,n)*1e-6)*(fund(k+1)')*S_k;
+%         S_k = generate_rotation_matrix(S*sqrtm(X_0+eye(n,n)*1e-6)*l,...
+%             sqrtm(B_sym(k)*Q_sym(k)*(B_sym(k)')+eye(n,n)*1e-6)*pinv(fund(k+1)')*l);
+%       
+        k = p;
+        l1 = fund(k+1)*l_1/norm(fund(k+1)*l_1); %ls{to_array(k)+1}{1}/norm(ls{to_array(k)+1}{1});
+        l2 = fund(k+1)*l_2/norm(fund(k+1)*l_2); %ls{to_array(k)+1}{directions_count}/norm(ls{to_array(k)+1}{directions_count});
         border_set{to_array(k)+1,dir} = ...
             ellipsoidalProjection(centers{to_array(k)+1},ellipses{to_array(k)+1,dir},...
                 l1, l2, 100);
         step = step+1;
         waitbar(step/steps,h);
-
+        
+        point = find_support_point(centers{to_array(p+1)},...
+            ellipses{to_array(p+1),dir},fund(p+1)*directions{dir})
+        points(:,dir,ps+1) = projection(point, fund(p+1)*l_1, fund(p+1)*l_2);
     end
 end
+
+
+
+% for i = 1:directions_count
+%     point = find_support_point(centers{to_array(k_1)},...
+%         ellipses{to_array(k_1),i},fund(k_1)*directions{i})
+%     points(i,:) = projection(point, fund(k_1)*l_1, fund(k_1)*l_2);
+% end
+% points
+
 for (k=(k_0+1):k_1)
     xs = border_set{to_array(k),1}(1, :);
     ys = border_set{to_array(k),1}(2, :);
