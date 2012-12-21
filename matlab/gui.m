@@ -22,7 +22,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 20-Dec-2012 04:32:43
+% Last Modified by GUIDE v2.5 20-Dec-2012 05:24:00
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -129,6 +129,16 @@ elseif  (choice == 3)
 end
 
 
+fund = eye(size(A));
+    if (choice == 2)
+        syms k;
+        A_sym = @(t)subs(A,k,t);
+        for j = k_0+1:k_1
+            fund = A_sym(j-1)*fund;
+        end
+        fund = pinv(fund);
+    end
+
 % colormap copper
 
 if (get(handles.checkboxHold,'Value') == 1)
@@ -142,11 +152,13 @@ else
     axes(handles.axesEllipses);
     hold(handles.axesEllipses,'off'); 
 end
-
+axes(handles.axesApproximation);
+axes(handles.axesApproximation);
+                                    figure
 if  (choice == 3)
-    axes(handles.axesApproximation);
-    grid(handles.axesApproximation,'on');
-   rotate3d(handles.axesApproximation,'on');
+    
+    grid on;
+    rotate3d on;
     plot_ia(opts.approximations,'r',struct('fill',0,'shade',0.7));
 else
 for k = k_0:k_1
@@ -160,51 +172,71 @@ for k = k_0:k_1
        rightk=k;
    end
       [leftk,rightk] 
-   axes(handles.axesApproximation);
-   colormap copper
-   mesh(handles.axesApproximation,...
+   
+   %colormap copper
+   mesh(gca,...
         linspace(leftk, rightk, len)'*ones(1, len), ...
         ones(1, len)'*opts.approximations{k_shifted}(1, :),...
         ones(1, len)'*opts.approximations{k_shifted}(2, :));
    hold on;
-   grid(handles.axesApproximation,'on');
-   rotate3d(handles.axesApproximation,'on');
+   grid on;
+   rotate3d on;
 end
- %xlabel('$t$','interpreter', 'latex');
- %ylabel('$l_1$','interpreter', 'latex');
- %zlabel('$l_2$','interpreter', 'latex');
+if (choice == 2)
+        for i = 2:k_1-k_0+1
+            plot3((k_0+i-1-0.5)*ones(length(opts.directions(2,:,i)),1),opts.directions(1,:,i),opts.directions(2,:,i),'og',...
+                'MarkerSize', 6, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'g');        
+        end
+end
+ xlabel('$k$','interpreter', 'latex');
+ ylabel('$l_1$','interpreter', 'latex');
+ zlabel('$l_2$','interpreter', 'latex');
+end
+
+if (choice == 2)
+    for i = 1:directions_count+1
+            lss = reshape(opts.directions(1,i,2:end),[k_1-k_0 1 1]);
+            lss2 = reshape(opts.directions(2,i,2:end),[k_1-k_0 1 1]);
+            %plot3(1-0.5:1:k_1-0.5,lss,lss2,...
+                 %'LineWidth',2);
+        end
 end
 
 axes(handles.axesEllipses);
+
+
+                        figure
+
+
 if  (choice == 3)
     color = 'r'
 else 
     color = 'b'
 end
+
 for (i = 1:directions_count)
+    
     coords = ellipsoidalProjection(opts.centers{k_1-k_0+1}, ...
-        opts.ellipses{k_1-k_0+1,i}, l_1, l_2, 100);
+        opts.ellipses{k_1-k_0+1,i}, fund'*l_1, fund'*l_2, 100);
     plot(coords(1,:),coords(2,:),color);
     hold on;
+    if (choice ~= 3)
+        plot(opts.approximations{k_1-k_0+1}(1,:),opts.approximations{k_1-k_0+1}(2,:),'g',...
+        'LineWidth',2);
+    else
+       plot_ia(cut(opts.approximations,k_1),'g');
+    end
 end
   if (choice == 2)
 %      proj = projection(opts.directions{k_1-k_0+1}{1:directions_count},l_1,l_2);
 %      for i = 1:length(proj)
 %          l = proj{i};
-          plot(opts.directions(1,:,k_1-k_0+1),opts.directions(2,:,k_1-k_0+1),'og');
-%      end
-        axes(handles.axesApproximation);
-        for i = 2:k_1-k_0+1
-            plot3((k_0+i-1-0.5)*ones(length(opts.directions(2,:,i)),1),opts.directions(1,:,i),opts.directions(2,:,i),'og',...
-                'MarkerSize', 6, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'g');        
-        end
-        for i = 1:directions_count+1
-            lss = reshape(opts.directions(1,i,2:end),[k_1-k_0 1 1]);
-            lss2 = reshape(opts.directions(2,i,2:end),[k_1-k_0 1 1]);
-            plot3(1-0.5:1:k_1-0.5,lss,lss2,...
-                 'LineWidth',4);
-        end
+          plot(opts.directions(1,:,k_1-k_0+1),opts.directions(2,:,k_1-k_0+1),'or');
+%      end        
+        
   end
+   xlabel('$l_1$','interpreter', 'latex');
+ ylabel('$l_2$','interpreter', 'latex');
 %plot(opts.approximations(k_1-k_0+1)(2,:))
 %if (handles.menuSolver)
 
@@ -338,6 +370,10 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-axes(handles.axesApproximation)
-saveas(gca, 'approx.eps', 'psc2')
-saveas(gca, 'ellips.eps', 'psc2')
+% axes(handles.axesApproximation)
+% saveas(gca, 'approx.eps', 'psc2')
+% saveas(gca, 'ellips.eps', 'psc2')
+% set(gcf,'menubar','figure')
+export_fig(handles.axesApproximation,'approx.eps')
+export_fig(handles.axesEllipses,'ell.eps')
+%copyfig(handles.axesApproximation)

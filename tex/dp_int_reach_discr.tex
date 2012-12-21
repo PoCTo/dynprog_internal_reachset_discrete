@@ -6,7 +6,8 @@
 \renewcommand{\ell}{\mathcal{E}}
 
 \usepackage{delim}
-
+\usepackage{subfigure}
+\usepackage{float}
                            
 \begin{document}
 \thispagestyle{empty}
@@ -224,7 +225,7 @@ u(k)\in \mathbb{R}^m, x(k)\in \mathbb{R}^n.
 Для проекции на динамическую плоскость рассматривается множество векторов в плоскости $(l_1,l_2)$ (например, равномерно распределенных по окружности единичного радиуса в этой плоскости), вычисляются значения $l_1(k), l_2(k)$ для каждого момента времени по формуле \eqref{newl}, затем по формуле \eqref{recurrent_good} рассчитываются эллипсоидальные оценки, проектируются в каждый момент времени $k$ на плоскость $(l_1(k),l_2(k))$ и объединяются.
 
 \section{Примеры работы}
-\subsection{Простой пример с прямоугольной матрицей}
+\subsection{Пример №1: 4-мерная система, прямоугольная матрица}
 Этот пример легко рассчитываем. Далее на его основе будет показана неточность работы ellipsoidal toolbox.
 Условия:
 \begin{gather*} A = \left(\begin{array}{cccc} 2 & 0 & 0 & 0\\ 0 & 1 & 0 & 0\\ 0 & 0 & 1 & 0\\ 0 & 0 & 0 & 1 \end{array}\right),\quad 
@@ -232,21 +233,242 @@ B = \left(\begin{array}{cc} 0 & 0\\ 0 & 2\\ 0 & 0\\ 0 & 0 \end{array}\right),\qu
 X_0 = \left(\begin{array}{cccc} 1 & 0 & 0 & 0\\ 0 & 1 & 0 & 0\\ 0 & 0 & 1 & 0\\ 0 & 0 & 0 & 1 \end{array}\right),\quad 
 x_0 = \left(\begin{array}{c} 0\\ 0\\ 0\\ 0 \end{array}\right), \\
 Q = \left(\begin{array}{cc} 1 & 0\\ 0 & 1 \end{array}\right), \quad
-q = \left(\begin{array}{c} 0\\ 0 \end{array}\right)
+q = \left(\begin{array}{c} 0\\ 0 \end{array}\right).
 \end{gather*} 
 
-\includegraphics{approx.eps}
+\begin{figure}[H]
+\subfigure[Трубка достижимости, $k=0,\dots 4$.]{
+\includegraphics[scale=0.45]{first_stat_3d.eps}
+}
+\subfigure[Эллипсы в момент $k=4$.]{
+\includegraphics[scale=0.45]{first_stat_2d.eps}
+}
+\caption{Проекция множества достижимости на статическую плоскость $\left\{(1,0,0,0)',(0,1,0,0)'\right\}$. Количество оценок --- 150.}
+\end{figure}
 
+\begin{figure}[H]
+\subfigure[Трубка достижимости, $k=0,\dots 4$.]{
+\includegraphics[scale=0.45]{first_tool_3d.eps}
+}
+\subfigure[Эллипсы в момент $k=4$.]{
+\includegraphics[scale=0.45]{first_tool_2d.eps}
+}
+\caption{Проекция множества достижимости на статическую плоскость $\left\{(1,0,0,0)',(0,1,0,0)'\right\}$ с помощью ellipsoidal toolbox. Количество оценок --- 100.}
+\end{figure}
 
+\begin{figure}[H]
+\subfigure[Трубка достижимости, $k=0,\dots 4$.]{
+\includegraphics[scale=0.45]{first_dyna_3d.eps}
+}
+\subfigure[Эллипсы в момент $k=4$.]{
+\includegraphics[scale=0.45]{first_dyna_2d.eps}
+}
+\caption{Проекция множества достижимости на динамическую плоскость с начальными положениями $\left\{(1,0,0,0)',(0,1,0,0)'\right\}$ с помощью ellipsoidal toolbox. Количество оценок --- 20.}
+\end{figure}
 
+Из вида матриц следует, что система независимо развивается по всем направлениям, причем для первых двух координат верны уравнения:
+\begin{gather*}
+x_1(k+1) = 2*x_1(k),\\
+x_2(k+1) = x_2(k)+2u_2,\quad u_2 \in[-1,1].
+\end{gather*}
 
+Отсюда видно, что система границы множества достижимости на каждом следующем шаге увеличиваются по модулю на единицу по $x_2$, и удваиваются по $x_1$. Так как начальный эллипсоид симметричен относительно начала координат и осей $Ox_1, Ox_2$, то и множество достижимости на каждом шаге будет также будет симметрично. Однако рисунок ellipsoidal toolbox если и приближается к симметричному относительно осей виду, то очень медленно. Отсюда следует сделать вывод, что либо в toolbox ошибка, либо слишком мала точность.
 
+\subsection{Пример №2: 3-мерная устойчивая система}
+\begin{gather*} A =
+\left(\begin{array}{ccc} -0.5 & 1 & 0\\ -1 & 1 & -0.5\\ -1 & 0 & -0.5 \end{array}\right),\quad
+B =
+\left(\begin{array}{ccc} 1 & 0 & 0\\ 0 & 1 & 0\\ 0 & 0 & 1 \end{array}\right),\quad
+X_0 =
+\left(\begin{array}{ccc} 1 & 0 & 0\\ 0 & 1 & 0\\ 0 & 0 & 1 \end{array}\right),\quad
+x_0 =
+\left(\begin{array}{c} 0\\ 0\\ 0 \end{array}\right),\quad \\
+Q =
+\left(\begin{array}{ccc} 1 & 0 & 0\\ 0 & 1 & 0\\ 0 & 0 & 1 \end{array}\right),\quad
+q =
+\left(\begin{array}{c} 0\\ 0\\ 0 \end{array}\right).
+\end{gather*}
 
+Матрица $A$ в данном примере является устойчивой, так как её собственные значения 
+$\{-0.25 + 0.661438i, -0.25 - 0.661438i, 0.5\}$ имеют вещественную часть, по модулю меньшую единицы.
 
+\begin{figure}[H]
+\subfigure[Трубка достижимости, $k=0,\dots 4$.]{
+\includegraphics[scale=0.45]{second_stat_3d.eps}
+}
+\subfigure[Эллипсы в момент $k=4$.]{
+\includegraphics[scale=0.45]{second_stat_2d.eps}
+}
+\caption{Проекция множества достижимости на статическую плоскость $\left\{(1,0,0)',(0,1,0)'\right\}$. Количество оценок --- 150.}
+\end{figure}
 
+\begin{figure}[H]
+\subfigure[Трубка достижимости, $k=0,\dots 4$.]{
+\includegraphics[scale=0.45]{second_tool_3d.eps}
+}
+\subfigure[Эллипсы в момент $k=4$.]{
+\includegraphics[scale=0.45]{second_tool_2d.eps}
+}
+\caption{Проекция множества достижимости на статическую плоскость $\left\{(1,0,0)',(0,1,0)'\right\}$ с помощью ellipsoidal toolbox. Количество оценок --- 150.}
+\end{figure}
 
+\begin{figure}[H]
+\subfigure[Трубка достижимости, $k=0,\dots 4$.]{
+\includegraphics[scale=0.45]{second_dyna_3d.eps}
+}
+\subfigure[Эллипсы в момент $k=4$.]{
+\includegraphics[scale=0.45]{second_dyna_2d.eps}
+}
+\caption{Проекция множества достижимости на динамическую плоскость с начальными положениями $\left\{(1,0,0)',(0,1,0)'\right\}$ с помощью ellipsoidal toolbox. Количество оценок --- 100.}
+\end{figure}
 
+Для этого примера характерно следующее: самописной программе, как и ellipsoidal toolbox, чтобы получить достаточно выпуклую фигуру, нужно большое количество направлений оценки, что приводит к большим затратам времени. Решением этой проблемы может быть разработка алгоритма с адаптивной сеткой направлений.
 
+\subsection{Пример №3: 3-мерная неустойчивая система}
+\begin{gather*}
+A =
+\left(\begin{array}{ccc} 2 & 1 & 0\\ -3 & 1 & -0.5\\ -1 & 0 & -2 \end{array}\right),\quad
+B =
+\left(\begin{array}{ccc} 0.6 & 0.3 & 0.1\\ 0.2 & 0.7 & 0.2\\ 0.5 & 0.1 & 1 \end{array}\right),\quad
+X_0 =
+\left(\begin{array}{ccc} 2 & 0 & 1\\ 0 & 2 & 0\\ 1 & 0 & 2 \end{array}\right),\quad
+x_0 =
+\left(\begin{array}{c} 0\\ 0\\ 0 \end{array}\right),\quad \\
+Q =
+\left(\begin{array}{ccc} 1 & 0 & 0\\ 0 & 1 & 0\\ 0 & 0 & 1 \end{array}\right),\quad
+q =
+\left(\begin{array}{c} 0\\ 0\\ 0 \end{array}\right).
+\end{gather*}
 
+Все собственные значения $\left( \{1.48307 + 1.62245 I, 1.48307 - 1.62245 I, -1.96613\} \right)$ имеют вещественную часть больше единицы, поэтому система неустойчива.
+
+\begin{figure}[H]
+\subfigure[Трубка достижимости, $k=0,\dots 8$.]{
+\includegraphics[scale=0.45]{third_stat_3d.eps}
+}
+\subfigure[Эллипсы в момент $k=8$.]{
+\includegraphics[scale=0.45]{third_stat_2d.eps}
+}
+\caption{Проекция множества достижимости на статическую плоскость $\left\{(1,0,2)',(1,1,1)'\right\}$. Количество оценок --- 100.}
+\end{figure}
+
+\begin{figure}[H]
+\subfigure[Трубка достижимости, $k=0,\dots 8$.]{
+\includegraphics[scale=0.45]{third_tool_3d.eps}
+}
+\subfigure[Эллипсы в момент $k=8$.]{
+\includegraphics[scale=0.45]{third_tool_2d.eps}
+}
+\caption{Проекция множества достижимости на статическую плоскость $\left\{(1,0,2)',(1,1,1)'\right\}$ с помощью ellipsoidal toolbox. Количество оценок --- 50.}
+\end{figure}
+
+\begin{figure}[H]
+\subfigure[Трубка достижимости, $k=0,\dots 8$.]{
+\includegraphics[scale=0.45]{third_dyna_3d.eps}
+}
+\subfigure[Эллипсы в момент $k=8$.]{
+\includegraphics[scale=0.45]{third_dyna_2d.eps}
+}
+\caption{Проекция множества достижимости на динамическую плоскость с начальными положениями $\left\{(1,0,2)',(1,1,1)'\right\}$ с помощью ellipsoidal toolbox. Количество оценок --- 50.}
+\end{figure}
+
+\subsection{Пример №4: нулевая матрица B}
+\begin{gather*}
+A =
+\left(\begin{array}{cc} 0.433884 & 0.900969\\ -0.900969 & 0.433884 \end{array}\right),\quad
+B =
+\left(\begin{array}{cc} 0 & 0\\ 0 & 0 \end{array}\right),\quad
+X_0 =
+\left(\begin{array}{cc} 16 & 0\\ 0 & 4 \end{array}\right),\quad
+x_0 =
+\left(\begin{array}{c} 0\\ 0 \end{array}\right),\\
+Q =
+\left(\begin{array}{cc} 1 & 0\\ 0 & 1 \end{array}\right),\quad
+q =
+\left(\begin{array}{c} 0\\ 0 \end{array}\right).
+\end{gather*}
+
+Программа корректно работает, например, при сингулярной матрице $B$. Результат работы ellipsoidal toolbox не приводится в силу очевидности.
+
+\begin{figure}[H]
+\subfigure[Трубка достижимости, $k=0,\dots 8$.]{
+\includegraphics[scale=0.45]{fourth_stat_3d.eps}
+}
+\subfigure[Эллипсы в момент $k=8$.]{
+\includegraphics[scale=0.45]{fourth_stat_2d.eps}
+}
+\caption{Проекция множества достижимости на статическую плоскость $\left\{(1,0)',(0,1)'\right\}$. Количество оценок --- 10.}
+\end{figure}
+
+\begin{figure}[H]
+\subfigure[Трубка достижимости, $k=0,\dots 8$.]{
+\includegraphics[scale=0.45]{fourth_dyna_3d.eps}
+}
+\subfigure[Эллипсы в момент $k=8$.]{
+\includegraphics[scale=0.45]{fourth_dyna_2d.eps}
+}
+\caption{Проекция множества достижимости на динамическую плоскость с начальными положениями $\left\{(1,0,2)',(1,1,1)'\right\}$ с помощью ellipsoidal toolbox. Количество оценок --- 10.}
+\end{figure}
+
+\subsection{Пример №5: нестационарная система}
+\begin{gather*}
+A =
+\left(\begin{array}{ccc} \sin\!\left(k\right) & 0 & 0\\ 0.75\, \cos\!\left(k\right) & 0 & 0.5\, \cos\!\left(k\right)\\ 0 & \sin\!\left(k\right) & 0 \end{array}\right), \quad
+B =
+\left(\begin{array}{cc} 0 & 1\\ 1 & 1\\ 2 & 1 \end{array}\right), \quad \\
+X_0 =
+\left(\begin{array}{ccc} \frac{1}{2} & 0 & 0\\ 0 & 1 & 0\\ 0 & 0 & 2 \end{array}\right), \quad
+x_0 =
+\left(\begin{array}{c} 0\\ 0\\ 0 \end{array}\right), \quad
+Q=
+\left(\begin{array}{cc} 2 & 1\\ 1 & 1 \end{array}\right), \quad
+q =
+\left(\begin{array}{c} 0\\ 0 \end{array}\right).
+\end{gather*}
+
+На этом примере вновь видно превосходство точности алгоритма из ellipsoidal toolbox при статической проекции: для достижения выпуклости фигуры в программе в данном случае требуется как минимум 1000 различных направлений. Приведён пример для $350$, поскольку график большего числа эллипсов слишком загромождён.
+
+\begin{figure}[H]
+\subfigure[Трубка достижимости, $k=1,\dots 5$.]{
+\includegraphics[scale=0.45]{fifth_stat_3d.eps}
+}
+\subfigure[Эллипсы в момент $k=5$.]{
+\includegraphics[scale=0.45]{fifth_stat_2d.eps}
+}
+\caption{Проекция множества достижимости на статическую плоскость $\left\{(1,0,2)',(2,2,1)'\right\}$. Количество оценок --- 350.}
+\end{figure}
+
+\begin{figure}[H]
+\subfigure[Трубка достижимости, $k=1,\dots 5$.]{
+\includegraphics[scale=0.45]{fifth_tool_3d.eps}
+}
+\subfigure[Эллипсы в момент $k=5$.]{
+\includegraphics[scale=0.45]{fifth_tool_2d.eps}
+}
+\caption{Проекция множества достижимости на статическую плоскость $\left\{(1,0,2)',(2,2,1)'\right\}$ с помощью ellipsoidal toolbox. Количество оценок --- 50.}
+\end{figure}
+
+\begin{figure}[H]
+\subfigure[Трубка достижимости, $k=1,\dots 5$.]{
+\includegraphics[scale=0.45]{fifth_dyna_3d.eps}
+}
+\subfigure[Эллипсы в момент $k=5$.]{
+\includegraphics[scale=0.45]{fifth_dyna_2d.eps}
+}
+\caption{Проекция множества достижимости на динамическую плоскость с начальными положениями $\left\{(1,0,2)',(2,2,1)'\right\}$ с помощью ellipsoidal toolbox. Количество оценок --- 150.}
+\end{figure}
+\section{Сравнение скоростей}
+Взяв за единицу скорость поиска одной эллипсоидальной оценки для системы размерности 3 (примерно $0.14$ секунды), были получены следующие относительные результаты:
+\begin{tabular}{|l|l|l|l|l|l|l|}
+\hline
+Размерность & 3 & 5 & 10 & 25 & 50 & 100 \\
+\hline
+Время работы ET & 1 & 1.1 & 1.3 & 1.5 & 3.1 &  18.8 \\
+\hline
+Время работы не ET & 2.7 & 3 & 4 & 5.2 & 12.5 & 40 \\
+\hline
+\end{tabular}
+
+Видно, что ellipsoidal toolbox, не считая проблем из примера 1, лучше оптимизирован, чем написанная для практикума программа.
 
 \end{document}
