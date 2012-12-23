@@ -22,7 +22,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 20-Dec-2012 05:24:00
+% Last Modified by GUIDE v2.5 23-Dec-2012 13:58:20
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -115,7 +115,7 @@ k_1_str = get(handles.editK1,'String');
 k_0 = str2num(k_0_str);
 k_1 = str2num(k_1_str);
 directions_count_str = get(handles.editDirectionCount,'String');
-directions_count_str
+%directions_count_str
 directions_count = str2num(directions_count_str);
 %opts = struct('ellipses','','approximations','','centers','','directions','');
 if (choice == 1) 
@@ -154,7 +154,11 @@ else
 end
 axes(handles.axesApproximation);
 axes(handles.axesApproximation);
-                                    figure
+                                    
+if (get(handles.checkboxNewWindows,'Value') == 1)
+    figure
+end
+
 if  (choice == 3)
     
     grid on;
@@ -178,6 +182,15 @@ for k = k_0:k_1
         linspace(leftk, rightk, len)'*ones(1, len), ...
         ones(1, len)'*opts.approximations{k_shifted}(1, :),...
         ones(1, len)'*opts.approximations{k_shifted}(2, :));
+   if (get(handles.checkboxDrawConvex,'Value') == 1)
+        K = convhull(opts.approximations{k_shifted}(1, :),opts.approximations{k_shifted}(2, :));
+        len2 = length(K);
+        mesh(gca,...
+            linspace(leftk, rightk, len2)'*ones(1, len2), ...
+            ones(1, len2)'*opts.approximations{k_shifted}(1, K),...
+            ones(1, len2)'*opts.approximations{k_shifted}(2, K),...
+            'facealpha',0.8);
+   end    
    hold on;
    grid on;
    rotate3d on;
@@ -197,15 +210,19 @@ if (choice == 2)
     for i = 1:directions_count+1
             lss = reshape(opts.directions(1,i,2:end),[k_1-k_0 1 1]);
             lss2 = reshape(opts.directions(2,i,2:end),[k_1-k_0 1 1]);
-            %plot3(1-0.5:1:k_1-0.5,lss,lss2,...
-                 %'LineWidth',2);
+            if (get(handles.checkboxGoodCurves,'Value') == 1)
+                plot3(1-0.5:1:k_1-0.5,lss,lss2,...
+                    'LineWidth',2);
+            end
         end
 end
 
 axes(handles.axesEllipses);
 
 
-                        figure
+if (get(handles.checkboxNewWindows,'Value') == 1)
+    figure
+end
 
 
 if  (choice == 3)
@@ -218,11 +235,18 @@ for (i = 1:directions_count)
     
     coords = ellipsoidalProjection(opts.centers{k_1-k_0+1}, ...
         opts.ellipses{k_1-k_0+1,i}, fund'*l_1, fund'*l_2, 100);
+    
     plot(coords(1,:),coords(2,:),color);
     hold on;
     if (choice ~= 3)
+        K = convhull(opts.approximations{k_1-k_0+1}(1,:),opts.approximations{k_1-k_0+1}(2,:));
+        if (get(handles.checkboxDrawConvex,'Value') == 1)
+            plot(opts.approximations{k_1-k_0+1}(1,K),opts.approximations{k_1-k_0+1}(2,K),'y',...
+            'LineWidth',2);
+        end    
         plot(opts.approximations{k_1-k_0+1}(1,:),opts.approximations{k_1-k_0+1}(2,:),'g',...
         'LineWidth',2);
+        
     else
        plot_ia(cut(opts.approximations,k_1),'g');
     end
@@ -377,3 +401,30 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 export_fig(handles.axesApproximation,'approx.eps')
 export_fig(handles.axesEllipses,'ell.eps')
 %copyfig(handles.axesApproximation)
+
+
+% --- Executes on button press in checkboxNewWindows.
+function checkboxNewWindows_Callback(hObject, eventdata, handles)
+% hObject    handle to checkboxNewWindows (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkboxNewWindows
+
+
+% --- Executes on button press in checkboxGoodCurves.
+function checkboxGoodCurves_Callback(hObject, eventdata, handles)
+% hObject    handle to checkboxGoodCurves (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkboxGoodCurves
+
+
+% --- Executes on button press in checkboxDrawConvex.
+function checkboxDrawConvex_Callback(hObject, eventdata, handles)
+% hObject    handle to checkboxDrawConvex (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkboxDrawConvex

@@ -1,6 +1,6 @@
 function [approximations, centers, ellipses, points] = ...
                 good_curves(l_1, l_2, k_0, k_1, directions_count)
-syms k;
+
 %A_s(k)=sym(A);
 %B_s(k)=sym(B);
 %Q_s(k)=sym(Q);
@@ -8,10 +8,42 @@ syms k;
 
 h = waitbar(0, 'Calculating...');
 
-A_sym = @(t)subs(A,k,t);
+syms k;
+A_sym1 = @(t)subs(A,k,t);
+%A_sym = @(t)(A_sym1(t) + A_svd(A_sym1(t))*const_svd);
 B_sym = @(t)subs(B,k,t);
 Q_sym = @(t)subs(Q,k,t);
 Q_c_sym = @(t)subs(Q_c);
+
+%const_svd = 1e-6;
+eps = 1e-4;
+sing = arrayfun(@(s)max(svd(A_sym1(s))),[k_0,k_1]);
+si = max(sing);
+ressing = 1;
+for i = 1:k_1-k_0-1
+    ressing = ressing + si^i;
+end
+const_sqrt = (eps / 2 / ressing)/2;
+
+sing = arrayfun(@(s)max(svd(B_sym(s)*Q_sym(s)*B_sym(s)')),[k_0,k_1]);
+si = max(sing);
+
+syms ee1;
+e1 = eval(solve(ee1+sqrt(ee1^2+2*si*ee1)-2*const_sqrt - 1e-5, ee1));
+
+maxsinga = -100500;
+for i=k_0:k_1
+    Matx = A_sym1(i)*(A_svd(A_sym1(i))');
+    Matx = Matx + Matx';
+    svds = svd(Matx);
+    maxsinga = max(max(svds),maxsinga);
+end
+const_svd = (-maxsinga+sqrt(maxsinga^2 + 4*eps^2))/3;
+%A_sym = @(t)(A_sym1(t) + A_svd(A_sym1(t))*const_svd);
+
+A_sym = @(t)regularize_nonsymm(A_sym1(t),1e-4);
+
+R_sym = @(t)(regularize_symm(B_sym(t)*Q_sym(t)*(B_sym(t)'),1e-4));
 
 to_array=@(k)(k-k_0+1);
             
@@ -45,14 +77,14 @@ angles = linspace(0,2*pi,directions_count);
   e_1 = l_1 / norm(l_1);
   e_2 = l_2 - e_1 * (e_1' * l_2);
   e_2 = e_2 / norm(e_2);
-  e_1
-  e_2
+  %e_1;
+  %e_2;
 for i=1:directions_count-1
     directions{i} = rand(n,1)*2 - 1;
     
     directions{i} = (e_1*cos(angles(i))+e_2*sin(angles(i)));
     %directions{i} = directions{i}/norm(directions{i});
-    directions{i}
+    %directions{i};
 end
 
 directions{directions_count} = e_2;
@@ -90,9 +122,9 @@ end
 approximations = cell(t_count,1);
 approximations{1} = ellipsoidalProjection(X_0_c,X_0,l_1,l_2,100);
 
-M = eye(n,n);
-S = eye(n,n);
-x0s = sqrtm(X_0+eye(n,n)*1e-6)*S';
+%M = eye(n,n);
+%S = eye(n,n);
+%x0s = sqrtm(X_0+eye(n,n)*1e-6)*S';
 border_set = cell(t_count, directions_count);
 
 % for dir=1:directions_count
@@ -108,39 +140,45 @@ find_support_point = @(q,Q,ell) q + Q * ell / sqrt(ell' * Q * ell);
 
 for dir=1:directions_count
     l = directions{dir};
-    M_k = sqrtm(X_0+eye(n,n)*1e-8);
+    M_k = sqrtm(X_0+eye(n,n)*const_sqrt);
     S = eye(n,n);
-    S_k = S;
+    %S_k = S;
     
     for p=(k_0):(k_1-1)
-        ps = to_array(p);
+            ps = to_array(p);
         k = p;
         fkp1 = fund(k+1);
         fkp1r = pinv(fund(k+1));
         S_k = generate_rotation_matrix( ...
-                S*sqrtm(X_0+eye(n,n)*1e-8)*l,...
-                   sqrtm(fkp1r *... %fund(p+1)*...
-                        B_sym(p)*Q_sym(p)*(B_sym(p)')*... %(fund(p+1)')
-                   (fkp1r')+eye(n,n)*1e-8)*l ...
+                S*sqrtm(X_0+eye(n,n)*const_sqrt)*l,...
+...%                    sqrtm(fkp1r *... %fund(p+1)*...
+...%                         (B_sym(p)*Q_sym(p)*(B_sym(p)')+eye(n,n)*const_sqrt)*... %(fund(p+1)')
+...%                    (fkp1r'))*l ...
+                ...%sqrtm((B_sym(p)*Q_sym(p)*(B_sym(p)')+eye(n,n)*const_sqrt))*...
+                sqrtm(R_sym(p))*...
+                (fkp1r')*l...
             );
         
         newsqrt = sqrtm(...
-                        fkp1r*...
-                        B_sym(p)*Q_sym(p)*(B_sym(p)')*...
-                        (fkp1r')+eye(n,n)*1e-8...
-                        );
+                        ...%fkp1r*...
+                        ...%(B_sym(p)*Q_sym(p)*(B_sym(p)')+eye(n,n)*const_sqrt)...%*...
+                        R_sym(p)...
+                        ...%(fkp1r')...
+                        )*(fkp1r');
         
-        ellipses{ps+1,dir} =...
+        ellipses{ps+1,dir} =(...
             A_sym(k)*ellipses{ps,dir}*(A_sym(k)') + ...
-            B_sym(p)*Q_sym(p)*(B_sym(p)') + ...
+            R_sym(p)+...%B_sym(p)*Q_sym(p)*(B_sym(p)') + ...
             fkp1*(...
                 M_k * S_k * newsqrt...
                 +... 
                 newsqrt' * (S_k') * (M_k')...                        
-            )*(fkp1');        
+            )*(fkp1'));        
         M_k = M_k + ...
-            sqrtm(...
-                fkp1r*B_sym(p)*Q_sym(p)*(B_sym(p)')*(fkp1r')+eye(n,n)*1e-8)...
+            ...%sqrtm(...
+                ...%fkp1r*(B_sym(p)*Q_sym(p)*(B_sym(p)')+eye(n,n)*const_sqrt)*(fkp1r'))...
+                ...%sqrtm(B_sym(p)*Q_sym(p)*(B_sym(p)')+eye(n,n)*const_sqrt)*(fkp1r')...
+                sqrtm(R_sym(p))*(fkp1r')...
                 *(S_k');
         
 %         ellipses{to_array(k+1),dir} = A_sym(k)*ellipses{to_array(k),dir}*(A_sym(k)') + ...
@@ -155,13 +193,13 @@ for dir=1:directions_count
 %             sqrtm(B_sym(k)*Q_sym(k)*(B_sym(k)')+eye(n,n)*1e-6)*pinv(fund(k+1)')*l);
 %       
         k = p;
-        l1 = fund(k+1)'*l_1;%/norm(fund(k+1)*l_1); %ls{to_array(k)+1}{1}/norm(ls{to_array(k)+1}{1});
-        l2 = fund(k+1)'*l_2;%/norm(fund(k+1)*l_2); %ls{to_array(k)+1}{directions_count}/norm(ls{to_array(k)+1}{directions_count});
+        %l1 = fund(k+1)'*l_1;%/norm(fund(k+1)*l_1); %ls{to_array(k)+1}{1}/norm(ls{to_array(k)+1}{1});
+        %l2 = fund(k+1)'*l_2;%/norm(fund(k+1)*l_2); %ls{to_array(k)+1}{directions_count}/norm(ls{to_array(k)+1}{directions_count});
         l1 = fkp1r'*l_1;
         l2 = fkp1r'*l_2;
-        border_set{to_array(k)+1,dir} = ...
+        border_set{to_array(k)+1,dir} = real(...
             ellipsoidalProjection(centers{to_array(k)+1},ellipses{to_array(k)+1,dir},...
-                l1, l2, 100);
+                l1, l2, 100));
         step = step+1;
         waitbar(step/steps,h);
         
@@ -183,10 +221,13 @@ end
 for (k=(k_0+1):k_1)
     xs = border_set{to_array(k),1}(1, :);
     ys = border_set{to_array(k),1}(2, :);
+    k
     [xs,ys] = poly2cw(xs,ys);
+    
     %xs = xs(end:-1:1);
     %ys = ys(end:-1:1);
     for r = 2:directions_count
+        k,r
         [border_set{to_array(k),r}(1,:),border_set{to_array(k),r}(2,:)] = ...
             poly2cw((border_set{to_array(k),r}(1,:)),(border_set{to_array(k),r}(2,:)));
         [xs,ys] = polybool('union',xs,ys,...
